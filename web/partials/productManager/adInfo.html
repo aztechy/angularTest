@@ -1,0 +1,10 @@
+<h1>Fill Out Ad Details</h1>
+<form>
+  <div>Title: <input type="text" ng-model="Item.title"/></div>
+  <div>Description: <textarea ng-model="Item.description"/></textarea></div>
+  <div>Price: <input type="text" ng-model="Item.price"/></div>
+  <button ng-click="previousStep()">Go Back</button>
+  <button ng-click="nextStep()">Continue</button>
+</form>
+
+{{ Item }}

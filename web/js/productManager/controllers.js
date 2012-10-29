@@ -2,7 +2,9 @@
 
 /* Controllers */
 
-function selectProduct($scope) {
+function selectProduct($scope, $location) {
+	$scope.masterItem = {category:"",subcategory:"",product:""};
+	
 	$scope.masterSubCategories = {
 		for_sale: [
 			{ key: 'cars', display: 'Cars' },
@@ -35,6 +37,33 @@ function selectProduct($scope) {
 	}
 	
 	$scope.updateSubcategory = function() {
-			$scope.subCategories = $scope.masterSubCategories[$scope.Item.category];
+		$scope.Item.subcategory = '';
+		$scope.Item.product = '';
+		$scope.subCategories = $scope.masterSubCategories[$scope.Item.category];
+	}
+	
+	$scope.updateItem = function(Item) {
+		localStorage.setItem('Item', JSON.stringify(Item));
+		$location.path('/adInfo');
+	}
+	
+	$scope.isClean = function() {
+		if ($scope.Item == undefined) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+
+function adInfo($scope, $location) {
+	$scope.Item = JSON.parse(localStorage.getItem('Item'));
+	
+	$scope.previousStep = function() {
+		$location.path('selectProduct');
+	}
+	
+	$scope.nextStep = function() {
+		console.log('Go to checkout');
 	}
 }
