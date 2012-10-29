@@ -2,3 +2,18 @@
 	text-decoration: line-through;
 	color: grey;
 }
+#filter, #totalUnpaid {
+	margin-bottom: 15px;
+}
+#totalUnpaid, #itemList {
+	margin-top: 15px;
+}
+#itemForm {
+	border: solid 1px black;
+	width: 200px;
+	padding: 5px 5px;
+}
+.splitSection {
+	border-bottom: 1px solid gray;
+	width: 200px;
+}

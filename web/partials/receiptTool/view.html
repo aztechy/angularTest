@@ -1,18 +1,31 @@
 <h2>Current Bill</h2>
-<div>Filter: <input ng-model="query"></div>
-<div ng-repeat="item in items | filter:query">
-  <input type="checkbox" ng-model="item.done"> <span class="done-{{item.done}}">{{ item.name }} - {{ (item.price * 1.0775 * 1.2) | currency }}</span>
+
+<div id="filter">Filter: <input ng-model="query"></div>
+
+<div class="splitSection"></div>
+
+<div id="itemList">
+  <div ng-repeat="item in items | filter:query">
+    <input type="checkbox" ng-model="item.done"> <span class="done-{{item.done}}">{{ item.name }} - {{ (item.price * 1.0775 * 1.2) | currency }}</span>
+  </div>
 </div>
 
-<div>Total Unpaid: {{ getUnpaid() | currency }}</div>
+<div id="totalUnpaid">Total Unpaid: {{ getUnpaid() | currency }}</div>
 
-<form>
+<div class="splitSection"></div>
+
+<h3>Add More Items</h3>
+<form id="itemForm">
   <div>
-    Item Name: <input type="text" ng-model="item.name">
+    Name:<br/>
+    <input type="text" ng-model="item.name">
   </div>
   <div>
-    Item Price: <input type="text" ng-model="item.price">
+    Price:<br>
+    <input type="text" ng-model="item.price">
   </div>
-  <button ng-click="addItem()">Add</button>
+  <div id="addItemButton">
+    <button ng-click="addItem()">Add</button>
+  </div>
 </form>
 
