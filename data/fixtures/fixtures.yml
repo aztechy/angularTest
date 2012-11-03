@@ -15,3 +15,24 @@
 #     password: changeme
 #     name:     Kris Wallsmith
 #     email:    kris.wallsmith@symfony-project.com
+
+product:
+  7_day_post:
+    name:     7 day posting
+    price:    60.00
+  30_day_post:
+    name:     30 day posting
+    price:    500.00
+  
+customProductPriceType:
+  category:
+    type: category
+  subcat:
+    type: subcategory
+    
+customProductPrice:
+  custom30Day:
+    product_id: 7_day_post
+    custom_product_price_type_id: category
+    price: 35.00
+  

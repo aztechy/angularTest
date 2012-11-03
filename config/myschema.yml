@@ -1,0 +1,24 @@
+propel:
+  _attributes:
+    package: lib.model
+    defaultIdMethod: native
+  custom_product_price_types:
+    _attributes: { phpName: CustomProductPriceType }
+    id: { phpName: Id, type: INTEGER, size: '11', primaryKey: true, autoIncrement: true, required: true }
+    type: { phpName: Type, type: VARCHAR, size: '255', required: true }
+  custom_product_prices:
+    _attributes: { phpName: CustomProductPrice }
+    id: { phpName: Id, type: INTEGER, size: '11', primaryKey: true, autoIncrement: true, required: true }
+    product_id: { phpName: ProductId, type: INTEGER, size: '11', required: true, foreignTable: products, foreignReference: id, onDelete: CASCADE, onUpdate: RESTRICT }
+    custom_product_price_type_id: { phpName: CustomProductPriceTypeId, type: INTEGER, size: '11', required: true, foreignTable: custom_product_price_types, foreignReference: id, onDelete: CASCADE, onUpdate: RESTRICT }
+    price: { phpName: Price, type: DECIMAL, size: '11', scale: '2', required: true }
+    created_at: { phpName: CreatedAt, type: TIMESTAMP, required: true }
+    modified_at: { phpName: ModifiedAt, type: TIMESTAMP, required: true }
+    _indexes: { product_id: [product_id], custom_product_price_type_id: [custom_product_price_type_id] }
+  products:
+    _attributes: { phpName: Product }
+    id: { phpName: Id, type: INTEGER, size: '11', primaryKey: true, autoIncrement: true, required: true }
+    name: { phpName: Name, type: VARCHAR, size: '100', required: false }
+    price: { phpName: Price, type: DECIMAL, size: '11', scale: '2', required: false, defaultValue: '0.00' }
+    created_at: { phpName: CreatedAt, type: TIMESTAMP, required: true }
+    modified_at: { phpName: ModifiedAt, type: TIMESTAMP, required: true }
