@@ -28,5 +28,26 @@ class Product extends BaseProduct {
 		// is where any default values for this object are set.
 		parent::__construct();
 	}
+	
+	public function getPrice($criterias = null) {
+	  if (is_null($criterias)) {
+	    return parent::getPrice();
+	  } else {
+	    $hit = false;
+	    foreach ($criterias as $c) {
+  	    $customPrices = $this->getCustomProductPrices($c);  
+  	    if (!empty($customPrices)) {
+  	      $hit = true;
+  	      break;
+  	    }
+	    }
+  	  
+  	  if (!$hit) {
+  	    return parent::getPrice();
+  	  } else {
+  	    return current($customPrices)->getPrice();
+  	  }	    
+	  }
+	}
 
 } // Product

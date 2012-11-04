@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Base class that represents a row from the 'products' table.
+ * Base class that represents a row from the 'fields' table.
  *
  * 
  *
@@ -11,14 +11,14 @@
  *
  * @package    lib.model.om
  */
-abstract class BaseProduct extends BaseObject  implements Persistent {
+abstract class BaseField extends BaseObject  implements Persistent {
 
 
 	/**
 	 * The Peer class.
 	 * Instance provides a convenient way of calling static methods on a class
 	 * that calling code may not be able to identify.
-	 * @var        ProductPeer
+	 * @var        FieldPeer
 	 */
 	protected static $peer;
 
@@ -29,17 +29,22 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	protected $id;
 
 	/**
-	 * The value for the name field.
-	 * @var        string
+	 * The value for the field_type_id field.
+	 * @var        int
 	 */
-	protected $name;
+	protected $field_type_id;
 
 	/**
-	 * The value for the price field.
-	 * Note: this column has a database default value of: '0.00'
+	 * The value for the token field.
 	 * @var        string
 	 */
-	protected $price;
+	protected $token;
+
+	/**
+	 * The value for the parent_id field.
+	 * @var        int
+	 */
+	protected $parent_id;
 
 	/**
 	 * The value for the created_at field.
@@ -52,6 +57,11 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	 * @var        string
 	 */
 	protected $modified_at;
+
+	/**
+	 * @var        FieldType
+	 */
+	protected $aFieldType;
 
 	/**
 	 * @var        array CustomProductPrice[] Collection to store aggregation of CustomProductPrice objects.
@@ -79,28 +89,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 
 	// symfony behavior
 	
-	const PEER = 'ProductPeer';
-
-	/**
-	 * Applies default values to this object.
-	 * This method should be called from the object's constructor (or
-	 * equivalent initialization method).
-	 * @see        __construct()
-	 */
-	public function applyDefaultValues()
-	{
-		$this->price = '0.00';
-	}
-
-	/**
-	 * Initializes internal state of BaseProduct object.
-	 * @see        applyDefaults()
-	 */
-	public function __construct()
-	{
-		parent::__construct();
-		$this->applyDefaultValues();
-	}
+	const PEER = 'FieldPeer';
 
 	/**
 	 * Get the [id] column value.
@@ -113,23 +102,33 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [name] column value.
+	 * Get the [field_type_id] column value.
 	 * 
-	 * @return     string
+	 * @return     int
 	 */
-	public function getName()
+	public function getFieldTypeId()
 	{
-		return $this->name;
+		return $this->field_type_id;
 	}
 
 	/**
-	 * Get the [price] column value.
+	 * Get the [token] column value.
 	 * 
 	 * @return     string
 	 */
-	public function getPrice()
+	public function getToken()
 	{
-		return $this->price;
+		return $this->token;
+	}
+
+	/**
+	 * Get the [parent_id] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getParentId()
+	{
+		return $this->parent_id;
 	}
 
 	/**
@@ -212,7 +211,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	 * Set the value of [id] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     Product The current object (for fluent API support)
+	 * @return     Field The current object (for fluent API support)
 	 */
 	public function setId($v)
 	{
@@ -222,58 +221,82 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 
 		if ($this->id !== $v) {
 			$this->id = $v;
-			$this->modifiedColumns[] = ProductPeer::ID;
+			$this->modifiedColumns[] = FieldPeer::ID;
 		}
 
 		return $this;
 	} // setId()
 
 	/**
-	 * Set the value of [name] column.
+	 * Set the value of [field_type_id] column.
 	 * 
-	 * @param      string $v new value
-	 * @return     Product The current object (for fluent API support)
+	 * @param      int $v new value
+	 * @return     Field The current object (for fluent API support)
 	 */
-	public function setName($v)
+	public function setFieldTypeId($v)
 	{
 		if ($v !== null) {
-			$v = (string) $v;
+			$v = (int) $v;
 		}
 
-		if ($this->name !== $v) {
-			$this->name = $v;
-			$this->modifiedColumns[] = ProductPeer::NAME;
+		if ($this->field_type_id !== $v) {
+			$this->field_type_id = $v;
+			$this->modifiedColumns[] = FieldPeer::FIELD_TYPE_ID;
+		}
+
+		if ($this->aFieldType !== null && $this->aFieldType->getId() !== $v) {
+			$this->aFieldType = null;
 		}
 
 		return $this;
-	} // setName()
+	} // setFieldTypeId()
 
 	/**
-	 * Set the value of [price] column.
+	 * Set the value of [token] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     Product The current object (for fluent API support)
+	 * @return     Field The current object (for fluent API support)
 	 */
-	public function setPrice($v)
+	public function setToken($v)
 	{
 		if ($v !== null) {
 			$v = (string) $v;
 		}
 
-		if ($this->price !== $v || $this->isNew()) {
-			$this->price = $v;
-			$this->modifiedColumns[] = ProductPeer::PRICE;
+		if ($this->token !== $v) {
+			$this->token = $v;
+			$this->modifiedColumns[] = FieldPeer::TOKEN;
 		}
 
 		return $this;
-	} // setPrice()
+	} // setToken()
+
+	/**
+	 * Set the value of [parent_id] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     Field The current object (for fluent API support)
+	 */
+	public function setParentId($v)
+	{
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->parent_id !== $v) {
+			$this->parent_id = $v;
+			$this->modifiedColumns[] = FieldPeer::PARENT_ID;
+		}
+
+		return $this;
+	} // setParentId()
 
 	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
-	 * @return     Product The current object (for fluent API support)
+	 * @return     Field The current object (for fluent API support)
 	 */
 	public function setCreatedAt($v)
 	{
@@ -310,7 +333,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 					)
 			{
 				$this->created_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = ProductPeer::CREATED_AT;
+				$this->modifiedColumns[] = FieldPeer::CREATED_AT;
 			}
 		} // if either are not null
 
@@ -322,7 +345,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
-	 * @return     Product The current object (for fluent API support)
+	 * @return     Field The current object (for fluent API support)
 	 */
 	public function setModifiedAt($v)
 	{
@@ -359,7 +382,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 					)
 			{
 				$this->modified_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = ProductPeer::MODIFIED_AT;
+				$this->modifiedColumns[] = FieldPeer::MODIFIED_AT;
 			}
 		} // if either are not null
 
@@ -376,10 +399,6 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	 */
 	public function hasOnlyDefaultValues()
 	{
-			if ($this->price !== '0.00') {
-				return false;
-			}
-
 		// otherwise, everything was equal, so return TRUE
 		return true;
 	} // hasOnlyDefaultValues()
@@ -403,10 +422,11 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-			$this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-			$this->price = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-			$this->created_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->modified_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->field_type_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+			$this->token = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+			$this->parent_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+			$this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->modified_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -416,10 +436,10 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 5; // 5 = ProductPeer::NUM_COLUMNS - ProductPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 6; // 6 = FieldPeer::NUM_COLUMNS - FieldPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
-			throw new PropelException("Error populating Product object", $e);
+			throw new PropelException("Error populating Field object", $e);
 		}
 	}
 
@@ -439,6 +459,9 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	public function ensureConsistency()
 	{
 
+		if ($this->aFieldType !== null && $this->field_type_id !== $this->aFieldType->getId()) {
+			$this->aFieldType = null;
+		}
 	} // ensureConsistency
 
 	/**
@@ -462,13 +485,13 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(FieldPeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		}
 
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
-		$stmt = ProductPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		$stmt = FieldPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {
@@ -478,6 +501,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 
 		if ($deep) {  // also de-associate any related objects?
 
+			$this->aFieldType = null;
 			$this->collCustomProductPrices = null;
 			$this->lastCustomProductPriceCriteria = null;
 
@@ -500,14 +524,14 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(FieldPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		
 		$con->beginTransaction();
 		try {
 			$ret = $this->preDelete($con);
 			// symfony_behaviors behavior
-			foreach (sfMixer::getCallables('BaseProduct:delete:pre') as $callable)
+			foreach (sfMixer::getCallables('BaseField:delete:pre') as $callable)
 			{
 			  if (call_user_func($callable, $this, $con))
 			  {
@@ -518,10 +542,10 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 			}
 
 			if ($ret) {
-				ProductPeer::doDelete($this, $con);
+				FieldPeer::doDelete($this, $con);
 				$this->postDelete($con);
 				// symfony_behaviors behavior
-				foreach (sfMixer::getCallables('BaseProduct:delete:post') as $callable)
+				foreach (sfMixer::getCallables('BaseField:delete:post') as $callable)
 				{
 				  call_user_func($callable, $this, $con);
 				}
@@ -557,7 +581,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(FieldPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		
 		$con->beginTransaction();
@@ -565,7 +589,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 		try {
 			$ret = $this->preSave($con);
 			// symfony_behaviors behavior
-			foreach (sfMixer::getCallables('BaseProduct:save:pre') as $callable)
+			foreach (sfMixer::getCallables('BaseField:save:pre') as $callable)
 			{
 			  if (is_integer($affectedRows = call_user_func($callable, $this, $con)))
 			  {
@@ -580,7 +604,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 			if ($isInsert) {
 				$ret = $ret && $this->preInsert($con);
 				// symfony_timestampable behavior
-				if (!$this->isColumnModified(ProductPeer::CREATED_AT))
+				if (!$this->isColumnModified(FieldPeer::CREATED_AT))
 				{
 				  $this->setCreatedAt(time());
 				}
@@ -597,12 +621,12 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 				}
 				$this->postSave($con);
 				// symfony_behaviors behavior
-				foreach (sfMixer::getCallables('BaseProduct:save:post') as $callable)
+				foreach (sfMixer::getCallables('BaseField:save:post') as $callable)
 				{
 				  call_user_func($callable, $this, $con, $affectedRows);
 				}
 
-				ProductPeer::addInstanceToPool($this);
+				FieldPeer::addInstanceToPool($this);
 			} else {
 				$affectedRows = 0;
 			}
@@ -631,14 +655,26 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 		if (!$this->alreadyInSave) {
 			$this->alreadyInSave = true;
 
+			// We call the save method on the following object(s) if they
+			// were passed to this object by their coresponding set
+			// method.  This object relates to these object(s) by a
+			// foreign key reference.
+
+			if ($this->aFieldType !== null) {
+				if ($this->aFieldType->isModified() || $this->aFieldType->isNew()) {
+					$affectedRows += $this->aFieldType->save($con);
+				}
+				$this->setFieldType($this->aFieldType);
+			}
+
 			if ($this->isNew() ) {
-				$this->modifiedColumns[] = ProductPeer::ID;
+				$this->modifiedColumns[] = FieldPeer::ID;
 			}
 
 			// If this object has been modified, then save it to the database.
 			if ($this->isModified()) {
 				if ($this->isNew()) {
-					$pk = ProductPeer::doInsert($this, $con);
+					$pk = FieldPeer::doInsert($this, $con);
 					$affectedRows += 1; // we are assuming that there is only 1 row per doInsert() which
 										 // should always be true here (even though technically
 										 // BasePeer::doInsert() can insert multiple rows).
@@ -647,7 +683,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 
 					$this->setNew(false);
 				} else {
-					$affectedRows += ProductPeer::doUpdate($this, $con);
+					$affectedRows += FieldPeer::doUpdate($this, $con);
 				}
 
 				$this->resetModified(); // [HL] After being saved an object is no longer 'modified'
@@ -727,7 +763,19 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 			$failureMap = array();
 
 
-			if (($retval = ProductPeer::doValidate($this, $columns)) !== true) {
+			// We call the validate method on the following object(s) if they
+			// were passed to this object by their coresponding set
+			// method.  This object relates to these object(s) by a
+			// foreign key reference.
+
+			if ($this->aFieldType !== null) {
+				if (!$this->aFieldType->validate($columns)) {
+					$failureMap = array_merge($failureMap, $this->aFieldType->getValidationFailures());
+				}
+			}
+
+
+			if (($retval = FieldPeer::doValidate($this, $columns)) !== true) {
 				$failureMap = array_merge($failureMap, $retval);
 			}
 
@@ -758,7 +806,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	 */
 	public function getByName($name, $type = BasePeer::TYPE_PHPNAME)
 	{
-		$pos = ProductPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+		$pos = FieldPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 		$field = $this->getByPosition($pos);
 		return $field;
 	}
@@ -777,15 +825,18 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 				return $this->getId();
 				break;
 			case 1:
-				return $this->getName();
+				return $this->getFieldTypeId();
 				break;
 			case 2:
-				return $this->getPrice();
+				return $this->getToken();
 				break;
 			case 3:
-				return $this->getCreatedAt();
+				return $this->getParentId();
 				break;
 			case 4:
+				return $this->getCreatedAt();
+				break;
+			case 5:
 				return $this->getModifiedAt();
 				break;
 			default:
@@ -807,13 +858,14 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	 */
 	public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true)
 	{
-		$keys = ProductPeer::getFieldNames($keyType);
+		$keys = FieldPeer::getFieldNames($keyType);
 		$result = array(
 			$keys[0] => $this->getId(),
-			$keys[1] => $this->getName(),
-			$keys[2] => $this->getPrice(),
-			$keys[3] => $this->getCreatedAt(),
-			$keys[4] => $this->getModifiedAt(),
+			$keys[1] => $this->getFieldTypeId(),
+			$keys[2] => $this->getToken(),
+			$keys[3] => $this->getParentId(),
+			$keys[4] => $this->getCreatedAt(),
+			$keys[5] => $this->getModifiedAt(),
 		);
 		return $result;
 	}
@@ -830,7 +882,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	 */
 	public function setByName($name, $value, $type = BasePeer::TYPE_PHPNAME)
 	{
-		$pos = ProductPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+		$pos = FieldPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 		return $this->setByPosition($pos, $value);
 	}
 
@@ -849,15 +901,18 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 				$this->setId($value);
 				break;
 			case 1:
-				$this->setName($value);
+				$this->setFieldTypeId($value);
 				break;
 			case 2:
-				$this->setPrice($value);
+				$this->setToken($value);
 				break;
 			case 3:
-				$this->setCreatedAt($value);
+				$this->setParentId($value);
 				break;
 			case 4:
+				$this->setCreatedAt($value);
+				break;
+			case 5:
 				$this->setModifiedAt($value);
 				break;
 		} // switch()
@@ -882,13 +937,14 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	 */
 	public function fromArray($arr, $keyType = BasePeer::TYPE_PHPNAME)
 	{
-		$keys = ProductPeer::getFieldNames($keyType);
+		$keys = FieldPeer::getFieldNames($keyType);
 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-		if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
-		if (array_key_exists($keys[2], $arr)) $this->setPrice($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setModifiedAt($arr[$keys[4]]);
+		if (array_key_exists($keys[1], $arr)) $this->setFieldTypeId($arr[$keys[1]]);
+		if (array_key_exists($keys[2], $arr)) $this->setToken($arr[$keys[2]]);
+		if (array_key_exists($keys[3], $arr)) $this->setParentId($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setModifiedAt($arr[$keys[5]]);
 	}
 
 	/**
@@ -898,13 +954,14 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	 */
 	public function buildCriteria()
 	{
-		$criteria = new Criteria(ProductPeer::DATABASE_NAME);
+		$criteria = new Criteria(FieldPeer::DATABASE_NAME);
 
-		if ($this->isColumnModified(ProductPeer::ID)) $criteria->add(ProductPeer::ID, $this->id);
-		if ($this->isColumnModified(ProductPeer::NAME)) $criteria->add(ProductPeer::NAME, $this->name);
-		if ($this->isColumnModified(ProductPeer::PRICE)) $criteria->add(ProductPeer::PRICE, $this->price);
-		if ($this->isColumnModified(ProductPeer::CREATED_AT)) $criteria->add(ProductPeer::CREATED_AT, $this->created_at);
-		if ($this->isColumnModified(ProductPeer::MODIFIED_AT)) $criteria->add(ProductPeer::MODIFIED_AT, $this->modified_at);
+		if ($this->isColumnModified(FieldPeer::ID)) $criteria->add(FieldPeer::ID, $this->id);
+		if ($this->isColumnModified(FieldPeer::FIELD_TYPE_ID)) $criteria->add(FieldPeer::FIELD_TYPE_ID, $this->field_type_id);
+		if ($this->isColumnModified(FieldPeer::TOKEN)) $criteria->add(FieldPeer::TOKEN, $this->token);
+		if ($this->isColumnModified(FieldPeer::PARENT_ID)) $criteria->add(FieldPeer::PARENT_ID, $this->parent_id);
+		if ($this->isColumnModified(FieldPeer::CREATED_AT)) $criteria->add(FieldPeer::CREATED_AT, $this->created_at);
+		if ($this->isColumnModified(FieldPeer::MODIFIED_AT)) $criteria->add(FieldPeer::MODIFIED_AT, $this->modified_at);
 
 		return $criteria;
 	}
@@ -919,9 +976,9 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	 */
 	public function buildPkeyCriteria()
 	{
-		$criteria = new Criteria(ProductPeer::DATABASE_NAME);
+		$criteria = new Criteria(FieldPeer::DATABASE_NAME);
 
-		$criteria->add(ProductPeer::ID, $this->id);
+		$criteria->add(FieldPeer::ID, $this->id);
 
 		return $criteria;
 	}
@@ -952,16 +1009,18 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	 * If desired, this method can also make copies of all associated (fkey referrers)
 	 * objects.
 	 *
-	 * @param      object $copyObj An object of Product (or compatible) type.
+	 * @param      object $copyObj An object of Field (or compatible) type.
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
 	 * @throws     PropelException
 	 */
 	public function copyInto($copyObj, $deepCopy = false)
 	{
 
-		$copyObj->setName($this->name);
+		$copyObj->setFieldTypeId($this->field_type_id);
 
-		$copyObj->setPrice($this->price);
+		$copyObj->setToken($this->token);
+
+		$copyObj->setParentId($this->parent_id);
 
 		$copyObj->setCreatedAt($this->created_at);
 
@@ -997,7 +1056,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	 * objects.
 	 *
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-	 * @return     Product Clone of current object.
+	 * @return     Field Clone of current object.
 	 * @throws     PropelException
 	 */
 	public function copy($deepCopy = false)
@@ -1016,14 +1075,63 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	 * same instance for all member of this class. The method could therefore
 	 * be static, but this would prevent one from overriding the behavior.
 	 *
-	 * @return     ProductPeer
+	 * @return     FieldPeer
 	 */
 	public function getPeer()
 	{
 		if (self::$peer === null) {
-			self::$peer = new ProductPeer();
+			self::$peer = new FieldPeer();
 		}
 		return self::$peer;
+	}
+
+	/**
+	 * Declares an association between this object and a FieldType object.
+	 *
+	 * @param      FieldType $v
+	 * @return     Field The current object (for fluent API support)
+	 * @throws     PropelException
+	 */
+	public function setFieldType(FieldType $v = null)
+	{
+		if ($v === null) {
+			$this->setFieldTypeId(NULL);
+		} else {
+			$this->setFieldTypeId($v->getId());
+		}
+
+		$this->aFieldType = $v;
+
+		// Add binding for other direction of this n:n relationship.
+		// If this object has already been added to the FieldType object, it will not be re-added.
+		if ($v !== null) {
+			$v->addField($this);
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * Get the associated FieldType object
+	 *
+	 * @param      PropelPDO Optional Connection object.
+	 * @return     FieldType The associated FieldType object.
+	 * @throws     PropelException
+	 */
+	public function getFieldType(PropelPDO $con = null)
+	{
+		if ($this->aFieldType === null && ($this->field_type_id !== null)) {
+			$this->aFieldType = FieldTypePeer::retrieveByPk($this->field_type_id);
+			/* The following can be used additionally to
+			   guarantee the related object contains a reference
+			   to this object.  This level of coupling may, however, be
+			   undesirable since it could result in an only partially populated collection
+			   in the referenced object.
+			   $this->aFieldType->addFields($this);
+			 */
+		}
+		return $this->aFieldType;
 	}
 
 	/**
@@ -1058,8 +1166,8 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	 * Gets an array of CustomProductPrice objects which contain a foreign key that references this object.
 	 *
 	 * If this collection has already been initialized with an identical Criteria, it returns the collection.
-	 * Otherwise if this Product has previously been saved, it will retrieve
-	 * related CustomProductPrices from storage. If this Product is new, it will return
+	 * Otherwise if this Field has previously been saved, it will retrieve
+	 * related CustomProductPrices from storage. If this Field is new, it will return
 	 * an empty collection or the current collection, the criteria is ignored on a new object.
 	 *
 	 * @param      PropelPDO $con
@@ -1070,7 +1178,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	public function getCustomProductPrices($criteria = null, PropelPDO $con = null)
 	{
 		if ($criteria === null) {
-			$criteria = new Criteria(ProductPeer::DATABASE_NAME);
+			$criteria = new Criteria(FieldPeer::DATABASE_NAME);
 		}
 		elseif ($criteria instanceof Criteria)
 		{
@@ -1082,7 +1190,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 			   $this->collCustomProductPrices = array();
 			} else {
 
-				$criteria->add(CustomProductPricePeer::PRODUCT_ID, $this->id);
+				$criteria->add(CustomProductPricePeer::FIELD_ID, $this->id);
 
 				CustomProductPricePeer::addSelectColumns($criteria);
 				$this->collCustomProductPrices = CustomProductPricePeer::doSelect($criteria, $con);
@@ -1095,7 +1203,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 				// one, just return the collection.
 
 
-				$criteria->add(CustomProductPricePeer::PRODUCT_ID, $this->id);
+				$criteria->add(CustomProductPricePeer::FIELD_ID, $this->id);
 
 				CustomProductPricePeer::addSelectColumns($criteria);
 				if (!isset($this->lastCustomProductPriceCriteria) || !$this->lastCustomProductPriceCriteria->equals($criteria)) {
@@ -1119,7 +1227,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	public function countCustomProductPrices(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
 	{
 		if ($criteria === null) {
-			$criteria = new Criteria(ProductPeer::DATABASE_NAME);
+			$criteria = new Criteria(FieldPeer::DATABASE_NAME);
 		} else {
 			$criteria = clone $criteria;
 		}
@@ -1135,7 +1243,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 				$count = 0;
 			} else {
 
-				$criteria->add(CustomProductPricePeer::PRODUCT_ID, $this->id);
+				$criteria->add(CustomProductPricePeer::FIELD_ID, $this->id);
 
 				$count = CustomProductPricePeer::doCount($criteria, false, $con);
 			}
@@ -1147,7 +1255,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 				// one, just return count of the collection.
 
 
-				$criteria->add(CustomProductPricePeer::PRODUCT_ID, $this->id);
+				$criteria->add(CustomProductPricePeer::FIELD_ID, $this->id);
 
 				if (!isset($this->lastCustomProductPriceCriteria) || !$this->lastCustomProductPriceCriteria->equals($criteria)) {
 					$count = CustomProductPricePeer::doCount($criteria, false, $con);
@@ -1176,7 +1284,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 		}
 		if (!in_array($l, $this->collCustomProductPrices, true)) { // only add it if the **same** object is not already associated
 			array_push($this->collCustomProductPrices, $l);
-			$l->setProduct($this);
+			$l->setField($this);
 		}
 	}
 
@@ -1184,18 +1292,18 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	/**
 	 * If this collection has already been initialized with
 	 * an identical criteria, it returns the collection.
-	 * Otherwise if this Product is new, it will return
-	 * an empty collection; or if this Product has previously
+	 * Otherwise if this Field is new, it will return
+	 * an empty collection; or if this Field has previously
 	 * been saved, it will retrieve related CustomProductPrices from storage.
 	 *
 	 * This method is protected by default in order to keep the public
 	 * api reasonable.  You can provide public methods for those you
-	 * actually need in Product.
+	 * actually need in Field.
 	 */
-	public function getCustomProductPricesJoinField($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	public function getCustomProductPricesJoinProduct($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		if ($criteria === null) {
-			$criteria = new Criteria(ProductPeer::DATABASE_NAME);
+			$criteria = new Criteria(FieldPeer::DATABASE_NAME);
 		}
 		elseif ($criteria instanceof Criteria)
 		{
@@ -1207,19 +1315,19 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 				$this->collCustomProductPrices = array();
 			} else {
 
-				$criteria->add(CustomProductPricePeer::PRODUCT_ID, $this->id);
+				$criteria->add(CustomProductPricePeer::FIELD_ID, $this->id);
 
-				$this->collCustomProductPrices = CustomProductPricePeer::doSelectJoinField($criteria, $con, $join_behavior);
+				$this->collCustomProductPrices = CustomProductPricePeer::doSelectJoinProduct($criteria, $con, $join_behavior);
 			}
 		} else {
 			// the following code is to determine if a new query is
 			// called for.  If the criteria is the same as the last
 			// one, just return the collection.
 
-			$criteria->add(CustomProductPricePeer::PRODUCT_ID, $this->id);
+			$criteria->add(CustomProductPricePeer::FIELD_ID, $this->id);
 
 			if (!isset($this->lastCustomProductPriceCriteria) || !$this->lastCustomProductPriceCriteria->equals($criteria)) {
-				$this->collCustomProductPrices = CustomProductPricePeer::doSelectJoinField($criteria, $con, $join_behavior);
+				$this->collCustomProductPrices = CustomProductPricePeer::doSelectJoinProduct($criteria, $con, $join_behavior);
 			}
 		}
 		$this->lastCustomProductPriceCriteria = $criteria;
@@ -1231,18 +1339,18 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	/**
 	 * If this collection has already been initialized with
 	 * an identical criteria, it returns the collection.
-	 * Otherwise if this Product is new, it will return
-	 * an empty collection; or if this Product has previously
+	 * Otherwise if this Field is new, it will return
+	 * an empty collection; or if this Field has previously
 	 * been saved, it will retrieve related CustomProductPrices from storage.
 	 *
 	 * This method is protected by default in order to keep the public
 	 * api reasonable.  You can provide public methods for those you
-	 * actually need in Product.
+	 * actually need in Field.
 	 */
 	public function getCustomProductPricesJoinCustomProductPriceType($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		if ($criteria === null) {
-			$criteria = new Criteria(ProductPeer::DATABASE_NAME);
+			$criteria = new Criteria(FieldPeer::DATABASE_NAME);
 		}
 		elseif ($criteria instanceof Criteria)
 		{
@@ -1254,7 +1362,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 				$this->collCustomProductPrices = array();
 			} else {
 
-				$criteria->add(CustomProductPricePeer::PRODUCT_ID, $this->id);
+				$criteria->add(CustomProductPricePeer::FIELD_ID, $this->id);
 
 				$this->collCustomProductPrices = CustomProductPricePeer::doSelectJoinCustomProductPriceType($criteria, $con, $join_behavior);
 			}
@@ -1263,7 +1371,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 			// called for.  If the criteria is the same as the last
 			// one, just return the collection.
 
-			$criteria->add(CustomProductPricePeer::PRODUCT_ID, $this->id);
+			$criteria->add(CustomProductPricePeer::FIELD_ID, $this->id);
 
 			if (!isset($this->lastCustomProductPriceCriteria) || !$this->lastCustomProductPriceCriteria->equals($criteria)) {
 				$this->collCustomProductPrices = CustomProductPricePeer::doSelectJoinCustomProductPriceType($criteria, $con, $join_behavior);
@@ -1294,6 +1402,7 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 		} // if ($deep)
 
 		$this->collCustomProductPrices = null;
+			$this->aFieldType = null;
 	}
 
 	// symfony_behaviors behavior
@@ -1303,9 +1412,9 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	 */
 	public function __call($method, $arguments)
 	{
-	  if (!$callable = sfMixer::getCallable('BaseProduct:'.$method))
+	  if (!$callable = sfMixer::getCallable('BaseField:'.$method))
 	  {
-	    throw new sfException(sprintf('Call to undefined method BaseProduct::%s', $method));
+	    throw new sfException(sprintf('Call to undefined method BaseField::%s', $method));
 	  }
 	
 	  array_unshift($arguments, $this);
@@ -1313,4 +1422,4 @@ abstract class BaseProduct extends BaseObject  implements Persistent {
 	  return call_user_func_array($callable, $arguments);
 	}
 
-} // BaseProduct
+} // BaseField

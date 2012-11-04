@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Base static class for performing query and update operations on the 'products' table.
+ * Base static class for performing query and update operations on the 'field_types' table.
  *
  * 
  *
@@ -11,49 +11,43 @@
  *
  * @package    lib.model.om
  */
-abstract class BaseProductPeer {
+abstract class BaseFieldTypePeer {
 
 	/** the default database name for this class */
 	const DATABASE_NAME = 'propel';
 
 	/** the table name for this class */
-	const TABLE_NAME = 'products';
+	const TABLE_NAME = 'field_types';
 
 	/** the related Propel class for this table */
-	const OM_CLASS = 'Product';
+	const OM_CLASS = 'FieldType';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.Product';
+	const CLASS_DEFAULT = 'lib.model.FieldType';
 
 	/** the related TableMap class for this table */
-	const TM_CLASS = 'ProductTableMap';
+	const TM_CLASS = 'FieldTypeTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 5;
+	const NUM_COLUMNS = 3;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
 	/** the column name for the ID field */
-	const ID = 'products.ID';
+	const ID = 'field_types.ID';
 
-	/** the column name for the NAME field */
-	const NAME = 'products.NAME';
+	/** the column name for the TYPE field */
+	const TYPE = 'field_types.TYPE';
 
-	/** the column name for the PRICE field */
-	const PRICE = 'products.PRICE';
-
-	/** the column name for the CREATED_AT field */
-	const CREATED_AT = 'products.CREATED_AT';
-
-	/** the column name for the MODIFIED_AT field */
-	const MODIFIED_AT = 'products.MODIFIED_AT';
+	/** the column name for the PARENT_ID field */
+	const PARENT_ID = 'field_types.PARENT_ID';
 
 	/**
-	 * An identiy map to hold any loaded instances of Product objects.
+	 * An identiy map to hold any loaded instances of FieldType objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
 	 * queries.
-	 * @var        array Product[]
+	 * @var        array FieldType[]
 	 */
 	public static $instances = array();
 
@@ -72,11 +66,11 @@ abstract class BaseProductPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Price', 'CreatedAt', 'ModifiedAt', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'price', 'createdAt', 'modifiedAt', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::NAME, self::PRICE, self::CREATED_AT, self::MODIFIED_AT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'price', 'created_at', 'modified_at', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'Type', 'ParentId', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'type', 'parentId', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::TYPE, self::PARENT_ID, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'type', 'parent_id', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, )
 	);
 
 	/**
@@ -86,11 +80,11 @@ abstract class BaseProductPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Price' => 2, 'CreatedAt' => 3, 'ModifiedAt' => 4, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'price' => 2, 'createdAt' => 3, 'modifiedAt' => 4, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::NAME => 1, self::PRICE => 2, self::CREATED_AT => 3, self::MODIFIED_AT => 4, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'price' => 2, 'created_at' => 3, 'modified_at' => 4, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Type' => 1, 'ParentId' => 2, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'type' => 1, 'parentId' => 2, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::TYPE => 1, self::PARENT_ID => 2, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'type' => 1, 'parent_id' => 2, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, )
 	);
 
 	/**
@@ -139,12 +133,12 @@ abstract class BaseProductPeer {
 	 *		$c->addJoin(TablePeer::alias("alias1", TablePeer::PRIMARY_KEY_COLUMN), TablePeer::PRIMARY_KEY_COLUMN);
 	 * </code>
 	 * @param      string $alias The alias for the current table.
-	 * @param      string $column The column name for current table. (i.e. ProductPeer::COLUMN_NAME).
+	 * @param      string $column The column name for current table. (i.e. FieldTypePeer::COLUMN_NAME).
 	 * @return     string
 	 */
 	public static function alias($alias, $column)
 	{
-		return str_replace(ProductPeer::TABLE_NAME.'.', $alias.'.', $column);
+		return str_replace(FieldTypePeer::TABLE_NAME.'.', $alias.'.', $column);
 	}
 
 	/**
@@ -160,11 +154,9 @@ abstract class BaseProductPeer {
 	 */
 	public static function addSelectColumns(Criteria $criteria)
 	{
-		$criteria->addSelectColumn(ProductPeer::ID);
-		$criteria->addSelectColumn(ProductPeer::NAME);
-		$criteria->addSelectColumn(ProductPeer::PRICE);
-		$criteria->addSelectColumn(ProductPeer::CREATED_AT);
-		$criteria->addSelectColumn(ProductPeer::MODIFIED_AT);
+		$criteria->addSelectColumn(FieldTypePeer::ID);
+		$criteria->addSelectColumn(FieldTypePeer::TYPE);
+		$criteria->addSelectColumn(FieldTypePeer::PARENT_ID);
 	}
 
 	/**
@@ -183,26 +175,26 @@ abstract class BaseProductPeer {
 		// We need to set the primary table name, since in the case that there are no WHERE columns
 		// it will be impossible for the BasePeer::createSelectSql() method to determine which
 		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(ProductPeer::TABLE_NAME);
+		$criteria->setPrimaryTableName(FieldTypePeer::TABLE_NAME);
 
 		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
 			$criteria->setDistinct();
 		}
 
 		if (!$criteria->hasSelectClause()) {
-			ProductPeer::addSelectColumns($criteria);
+			FieldTypePeer::addSelectColumns($criteria);
 		}
 
 		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 		$criteria->setDbName(self::DATABASE_NAME); // Set the correct dbName
 
 		if ($con === null) {
-			$con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(FieldTypePeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		}
 		// symfony_behaviors behavior
 		foreach (sfMixer::getCallables(self::getMixerPreSelectHook(__FUNCTION__)) as $sf_hook)
 		{
-		  call_user_func($sf_hook, 'BaseProductPeer', $criteria, $con);
+		  call_user_func($sf_hook, 'BaseFieldTypePeer', $criteria, $con);
 		}
 
 		// BasePeer returns a PDOStatement
@@ -221,7 +213,7 @@ abstract class BaseProductPeer {
 	 *
 	 * @param      Criteria $criteria object used to create the SELECT statement.
 	 * @param      PropelPDO $con
-	 * @return     Product
+	 * @return     FieldType
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
@@ -229,7 +221,7 @@ abstract class BaseProductPeer {
 	{
 		$critcopy = clone $criteria;
 		$critcopy->setLimit(1);
-		$objects = ProductPeer::doSelect($critcopy, $con);
+		$objects = FieldTypePeer::doSelect($critcopy, $con);
 		if ($objects) {
 			return $objects[0];
 		}
@@ -246,7 +238,7 @@ abstract class BaseProductPeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{
-		return ProductPeer::populateObjects(ProductPeer::doSelectStmt($criteria, $con));
+		return FieldTypePeer::populateObjects(FieldTypePeer::doSelectStmt($criteria, $con));
 	}
 	/**
 	 * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
@@ -264,12 +256,12 @@ abstract class BaseProductPeer {
 	public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(FieldTypePeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		}
 
 		if (!$criteria->hasSelectClause()) {
 			$criteria = clone $criteria;
-			ProductPeer::addSelectColumns($criteria);
+			FieldTypePeer::addSelectColumns($criteria);
 		}
 
 		// Set the correct dbName
@@ -277,7 +269,7 @@ abstract class BaseProductPeer {
 		// symfony_behaviors behavior
 		foreach (sfMixer::getCallables(self::getMixerPreSelectHook(__FUNCTION__)) as $sf_hook)
 		{
-		  call_user_func($sf_hook, 'BaseProductPeer', $criteria, $con);
+		  call_user_func($sf_hook, 'BaseFieldTypePeer', $criteria, $con);
 		}
 
 
@@ -293,10 +285,10 @@ abstract class BaseProductPeer {
 	 * to the cache in order to ensure that the same objects are always returned by doSelect*()
 	 * and retrieveByPK*() calls.
 	 *
-	 * @param      Product $value A Product object.
+	 * @param      FieldType $value A FieldType object.
 	 * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
 	 */
-	public static function addInstanceToPool(Product $obj, $key = null)
+	public static function addInstanceToPool(FieldType $obj, $key = null)
 	{
 		if (Propel::isInstancePoolingEnabled()) {
 			if ($key === null) {
@@ -314,18 +306,18 @@ abstract class BaseProductPeer {
 	 * methods in your stub classes -- you may need to explicitly remove objects
 	 * from the cache in order to prevent returning objects that no longer exist.
 	 *
-	 * @param      mixed $value A Product object or a primary key value.
+	 * @param      mixed $value A FieldType object or a primary key value.
 	 */
 	public static function removeInstanceFromPool($value)
 	{
 		if (Propel::isInstancePoolingEnabled() && $value !== null) {
-			if (is_object($value) && $value instanceof Product) {
+			if (is_object($value) && $value instanceof FieldType) {
 				$key = (string) $value->getId();
 			} elseif (is_scalar($value)) {
 				// assume we've been passed a primary key
 				$key = (string) $value;
 			} else {
-				$e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or Product object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
+				$e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or FieldType object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
 				throw $e;
 			}
 
@@ -340,7 +332,7 @@ abstract class BaseProductPeer {
 	 * a multi-column primary key, a serialize()d version of the primary key will be returned.
 	 *
 	 * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-	 * @return     Product Found object or NULL if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+	 * @return     FieldType Found object or NULL if 1) no instance exists for specified key or 2) instance pooling has been disabled.
 	 * @see        getPrimaryKeyHash()
 	 */
 	public static function getInstanceFromPool($key)
@@ -364,14 +356,11 @@ abstract class BaseProductPeer {
 	}
 	
 	/**
-	 * Method to invalidate the instance pool of all tables related to products
+	 * Method to invalidate the instance pool of all tables related to field_types
 	 * by a foreign key with ON DELETE CASCADE
 	 */
 	public static function clearRelatedInstancePool()
 	{
-		// invalidate objects in CustomProductPricePeer instance pool, since one or more of them may be deleted by ON DELETE CASCADE rule.
-		CustomProductPricePeer::clearInstancePool();
-
 	}
 
 	/**
@@ -405,11 +394,11 @@ abstract class BaseProductPeer {
 		$results = array();
 	
 		// set the class once to avoid overhead in the loop
-		$cls = ProductPeer::getOMClass(false);
+		$cls = FieldTypePeer::getOMClass(false);
 		// populate the object(s)
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key = ProductPeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj = ProductPeer::getInstanceFromPool($key))) {
+			$key = FieldTypePeer::getPrimaryKeyHashFromRow($row, 0);
+			if (null !== ($obj = FieldTypePeer::getInstanceFromPool($key))) {
 				// We no longer rehydrate the object, since this can cause data loss.
 				// See http://propel.phpdb.org/trac/ticket/509
 				// $obj->hydrate($row, 0, true); // rehydrate
@@ -418,7 +407,7 @@ abstract class BaseProductPeer {
 				$obj = new $cls();
 				$obj->hydrate($row);
 				$results[] = $obj;
-				ProductPeer::addInstanceToPool($obj, $key);
+				FieldTypePeer::addInstanceToPool($obj, $key);
 			} // if key exists
 		}
 		$stmt->closeCursor();
@@ -441,10 +430,10 @@ abstract class BaseProductPeer {
 	 */
 	public static function buildTableMap()
 	{
-	  $dbMap = Propel::getDatabaseMap(BaseProductPeer::DATABASE_NAME);
-	  if (!$dbMap->hasTable(BaseProductPeer::TABLE_NAME))
+	  $dbMap = Propel::getDatabaseMap(BaseFieldTypePeer::DATABASE_NAME);
+	  if (!$dbMap->hasTable(BaseFieldTypePeer::TABLE_NAME))
 	  {
-	    $dbMap->addTableObject(new ProductTableMap());
+	    $dbMap->addTableObject(new FieldTypeTableMap());
 	  }
 	}
 
@@ -461,13 +450,13 @@ abstract class BaseProductPeer {
 	 */
 	public static function getOMClass($withPrefix = true)
 	{
-		return $withPrefix ? ProductPeer::CLASS_DEFAULT : ProductPeer::OM_CLASS;
+		return $withPrefix ? FieldTypePeer::CLASS_DEFAULT : FieldTypePeer::OM_CLASS;
 	}
 
 	/**
-	 * Method perform an INSERT on the database, given a Product or Criteria object.
+	 * Method perform an INSERT on the database, given a FieldType or Criteria object.
 	 *
-	 * @param      mixed $values Criteria or Product object containing data that is used to create the INSERT statement.
+	 * @param      mixed $values Criteria or FieldType object containing data that is used to create the INSERT statement.
 	 * @param      PropelPDO $con the PropelPDO connection to use
 	 * @return     mixed The new primary key.
 	 * @throws     PropelException Any exceptions caught during processing will be
@@ -476,26 +465,26 @@ abstract class BaseProductPeer {
 	public static function doInsert($values, PropelPDO $con = null)
 	{
     // symfony_behaviors behavior
-    foreach (sfMixer::getCallables('BaseProductPeer:doInsert:pre') as $sf_hook)
+    foreach (sfMixer::getCallables('BaseFieldTypePeer:doInsert:pre') as $sf_hook)
     {
-      if (false !== $sf_hook_retval = call_user_func($sf_hook, 'BaseProductPeer', $values, $con))
+      if (false !== $sf_hook_retval = call_user_func($sf_hook, 'BaseFieldTypePeer', $values, $con))
       {
         return $sf_hook_retval;
       }
     }
 
 		if ($con === null) {
-			$con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(FieldTypePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
 		} else {
-			$criteria = $values->buildCriteria(); // build Criteria from Product object
+			$criteria = $values->buildCriteria(); // build Criteria from FieldType object
 		}
 
-		if ($criteria->containsKey(ProductPeer::ID) && $criteria->keyContainsValue(ProductPeer::ID) ) {
-			throw new PropelException('Cannot insert a value for auto-increment primary key ('.ProductPeer::ID.')');
+		if ($criteria->containsKey(FieldTypePeer::ID) && $criteria->keyContainsValue(FieldTypePeer::ID) ) {
+			throw new PropelException('Cannot insert a value for auto-increment primary key ('.FieldTypePeer::ID.')');
 		}
 
 
@@ -514,18 +503,18 @@ abstract class BaseProductPeer {
 		}
 
     // symfony_behaviors behavior
-    foreach (sfMixer::getCallables('BaseProductPeer:doInsert:post') as $sf_hook)
+    foreach (sfMixer::getCallables('BaseFieldTypePeer:doInsert:post') as $sf_hook)
     {
-      call_user_func($sf_hook, 'BaseProductPeer', $values, $con, $pk);
+      call_user_func($sf_hook, 'BaseFieldTypePeer', $values, $con, $pk);
     }
 
 		return $pk;
 	}
 
 	/**
-	 * Method perform an UPDATE on the database, given a Product or Criteria object.
+	 * Method perform an UPDATE on the database, given a FieldType or Criteria object.
 	 *
-	 * @param      mixed $values Criteria or Product object containing data that is used to create the UPDATE statement.
+	 * @param      mixed $values Criteria or FieldType object containing data that is used to create the UPDATE statement.
 	 * @param      PropelPDO $con The connection to use (specify PropelPDO connection object to exert more control over transactions).
 	 * @return     int The number of affected rows (if supported by underlying database driver).
 	 * @throws     PropelException Any exceptions caught during processing will be
@@ -534,16 +523,16 @@ abstract class BaseProductPeer {
 	public static function doUpdate($values, PropelPDO $con = null)
 	{
     // symfony_behaviors behavior
-    foreach (sfMixer::getCallables('BaseProductPeer:doUpdate:pre') as $sf_hook)
+    foreach (sfMixer::getCallables('BaseFieldTypePeer:doUpdate:pre') as $sf_hook)
     {
-      if (false !== $sf_hook_retval = call_user_func($sf_hook, 'BaseProductPeer', $values, $con))
+      if (false !== $sf_hook_retval = call_user_func($sf_hook, 'BaseFieldTypePeer', $values, $con))
       {
         return $sf_hook_retval;
       }
     }
 
 		if ($con === null) {
-			$con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(FieldTypePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		$selectCriteria = new Criteria(self::DATABASE_NAME);
@@ -551,10 +540,10 @@ abstract class BaseProductPeer {
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
 
-			$comparison = $criteria->getComparison(ProductPeer::ID);
-			$selectCriteria->add(ProductPeer::ID, $criteria->remove(ProductPeer::ID), $comparison);
+			$comparison = $criteria->getComparison(FieldTypePeer::ID);
+			$selectCriteria->add(FieldTypePeer::ID, $criteria->remove(FieldTypePeer::ID), $comparison);
 
-		} else { // $values is Product object
+		} else { // $values is FieldType object
 			$criteria = $values->buildCriteria(); // gets full criteria
 			$selectCriteria = $values->buildPkeyCriteria(); // gets criteria w/ primary key(s)
 		}
@@ -565,36 +554,35 @@ abstract class BaseProductPeer {
 		$ret = BasePeer::doUpdate($selectCriteria, $criteria, $con);
 
     // symfony_behaviors behavior
-    foreach (sfMixer::getCallables('BaseProductPeer:doUpdate:post') as $sf_hook)
+    foreach (sfMixer::getCallables('BaseFieldTypePeer:doUpdate:post') as $sf_hook)
     {
-      call_user_func($sf_hook, 'BaseProductPeer', $values, $con, $ret);
+      call_user_func($sf_hook, 'BaseFieldTypePeer', $values, $con, $ret);
     }
 
     return $ret;
 	}
 
 	/**
-	 * Method to DELETE all rows from the products table.
+	 * Method to DELETE all rows from the field_types table.
 	 *
 	 * @return     int The number of affected rows (if supported by underlying database driver).
 	 */
 	public static function doDeleteAll($con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(FieldTypePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		$affectedRows = 0; // initialize var to track total num of affected rows
 		try {
 			// use transaction because $criteria could contain info
 			// for more than one table or we could emulating ON DELETE CASCADE, etc.
 			$con->beginTransaction();
-			$affectedRows += ProductPeer::doOnDeleteCascade(new Criteria(ProductPeer::DATABASE_NAME), $con);
-			$affectedRows += BasePeer::doDeleteAll(ProductPeer::TABLE_NAME, $con);
+			$affectedRows += BasePeer::doDeleteAll(FieldTypePeer::TABLE_NAME, $con);
 			// Because this db requires some delete cascade/set null emulation, we have to
 			// clear the cached instance *after* the emulation has happened (since
 			// instances get re-added by the select statement contained therein).
-			ProductPeer::clearInstancePool();
-			ProductPeer::clearRelatedInstancePool();
+			FieldTypePeer::clearInstancePool();
+			FieldTypePeer::clearRelatedInstancePool();
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -604,9 +592,9 @@ abstract class BaseProductPeer {
 	}
 
 	/**
-	 * Method perform a DELETE on the database, given a Product or Criteria object OR a primary key value.
+	 * Method perform a DELETE on the database, given a FieldType or Criteria object OR a primary key value.
 	 *
-	 * @param      mixed $values Criteria or Product object or primary key or array of primary keys
+	 * @param      mixed $values Criteria or FieldType object or primary key or array of primary keys
 	 *              which is used to create the DELETE statement
 	 * @param      PropelPDO $con the connection to use
 	 * @return     int 	The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -617,18 +605,28 @@ abstract class BaseProductPeer {
 	 public static function doDelete($values, PropelPDO $con = null)
 	 {
 		if ($con === null) {
-			$con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(FieldTypePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		if ($values instanceof Criteria) {
+			// invalidate the cache for all objects of this type, since we have no
+			// way of knowing (without running a query) what objects should be invalidated
+			// from the cache based on this Criteria.
+			FieldTypePeer::clearInstancePool();
 			// rename for clarity
 			$criteria = clone $values;
-		} elseif ($values instanceof Product) { // it's a model object
+		} elseif ($values instanceof FieldType) { // it's a model object
+			// invalidate the cache for this single object
+			FieldTypePeer::removeInstanceFromPool($values);
 			// create criteria based on pk values
 			$criteria = $values->buildPkeyCriteria();
 		} else { // it's a primary key, or an array of pks
 			$criteria = new Criteria(self::DATABASE_NAME);
-			$criteria->add(ProductPeer::ID, (array) $values, Criteria::IN);
+			$criteria->add(FieldTypePeer::ID, (array) $values, Criteria::IN);
+			// invalidate the cache for this object(s)
+			foreach ((array) $values as $singleval) {
+				FieldTypePeer::removeInstanceFromPool($singleval);
+			}
 		}
 
 		// Set the correct dbName
@@ -640,23 +638,9 @@ abstract class BaseProductPeer {
 			// use transaction because $criteria could contain info
 			// for more than one table or we could emulating ON DELETE CASCADE, etc.
 			$con->beginTransaction();
-			$affectedRows += ProductPeer::doOnDeleteCascade($criteria, $con);
-			
-			// Because this db requires some delete cascade/set null emulation, we have to
-			// clear the cached instance *after* the emulation has happened (since
-			// instances get re-added by the select statement contained therein).
-			if ($values instanceof Criteria) {
-				ProductPeer::clearInstancePool();
-			} elseif ($values instanceof Product) { // it's a model object
-				ProductPeer::removeInstanceFromPool($values);
-			} else { // it's a primary key, or an array of pks
-				foreach ((array) $values as $singleval) {
-					ProductPeer::removeInstanceFromPool($singleval);
-				}
-			}
 			
 			$affectedRows += BasePeer::doDelete($criteria, $con);
-			ProductPeer::clearRelatedInstancePool();
+			FieldTypePeer::clearRelatedInstancePool();
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -666,56 +650,24 @@ abstract class BaseProductPeer {
 	}
 
 	/**
-	 * This is a method for emulating ON DELETE CASCADE for DBs that don't support this
-	 * feature (like MySQL or SQLite).
-	 *
-	 * This method is not very speedy because it must perform a query first to get
-	 * the implicated records and then perform the deletes by calling those Peer classes.
-	 *
-	 * This method should be used within a transaction if possible.
-	 *
-	 * @param      Criteria $criteria
-	 * @param      PropelPDO $con
-	 * @return     int The number of affected rows (if supported by underlying database driver).
-	 */
-	protected static function doOnDeleteCascade(Criteria $criteria, PropelPDO $con)
-	{
-		// initialize var to track total num of affected rows
-		$affectedRows = 0;
-
-		// first find the objects that are implicated by the $criteria
-		$objects = ProductPeer::doSelect($criteria, $con);
-		foreach ($objects as $obj) {
-
-
-			// delete related CustomProductPrice objects
-			$criteria = new Criteria(CustomProductPricePeer::DATABASE_NAME);
-			
-			$criteria->add(CustomProductPricePeer::PRODUCT_ID, $obj->getId());
-			$affectedRows += CustomProductPricePeer::doDelete($criteria, $con);
-		}
-		return $affectedRows;
-	}
-
-	/**
-	 * Validates all modified columns of given Product object.
+	 * Validates all modified columns of given FieldType object.
 	 * If parameter $columns is either a single column name or an array of column names
 	 * than only those columns are validated.
 	 *
 	 * NOTICE: This does not apply to primary or foreign keys for now.
 	 *
-	 * @param      Product $obj The object to validate.
+	 * @param      FieldType $obj The object to validate.
 	 * @param      mixed $cols Column name or array of column names.
 	 *
 	 * @return     mixed TRUE if all columns are valid or the error message of the first invalid column.
 	 */
-	public static function doValidate(Product $obj, $cols = null)
+	public static function doValidate(FieldType $obj, $cols = null)
 	{
 		$columns = array();
 
 		if ($cols) {
-			$dbMap = Propel::getDatabaseMap(ProductPeer::DATABASE_NAME);
-			$tableMap = $dbMap->getTable(ProductPeer::TABLE_NAME);
+			$dbMap = Propel::getDatabaseMap(FieldTypePeer::DATABASE_NAME);
+			$tableMap = $dbMap->getTable(FieldTypePeer::TABLE_NAME);
 
 			if (! is_array($cols)) {
 				$cols = array($cols);
@@ -731,7 +683,7 @@ abstract class BaseProductPeer {
 
 		}
 
-		return BasePeer::doValidate(ProductPeer::DATABASE_NAME, ProductPeer::TABLE_NAME, $columns);
+		return BasePeer::doValidate(FieldTypePeer::DATABASE_NAME, FieldTypePeer::TABLE_NAME, $columns);
 	}
 
 	/**
@@ -739,23 +691,23 @@ abstract class BaseProductPeer {
 	 *
 	 * @param      int $pk the primary key.
 	 * @param      PropelPDO $con the connection to use
-	 * @return     Product
+	 * @return     FieldType
 	 */
 	public static function retrieveByPK($pk, PropelPDO $con = null)
 	{
 
-		if (null !== ($obj = ProductPeer::getInstanceFromPool((string) $pk))) {
+		if (null !== ($obj = FieldTypePeer::getInstanceFromPool((string) $pk))) {
 			return $obj;
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(FieldTypePeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		}
 
-		$criteria = new Criteria(ProductPeer::DATABASE_NAME);
-		$criteria->add(ProductPeer::ID, $pk);
+		$criteria = new Criteria(FieldTypePeer::DATABASE_NAME);
+		$criteria->add(FieldTypePeer::ID, $pk);
 
-		$v = ProductPeer::doSelect($criteria, $con);
+		$v = FieldTypePeer::doSelect($criteria, $con);
 
 		return !empty($v) > 0 ? $v[0] : null;
 	}
@@ -771,16 +723,16 @@ abstract class BaseProductPeer {
 	public static function retrieveByPKs($pks, PropelPDO $con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(FieldTypePeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		}
 
 		$objs = null;
 		if (empty($pks)) {
 			$objs = array();
 		} else {
-			$criteria = new Criteria(ProductPeer::DATABASE_NAME);
-			$criteria->add(ProductPeer::ID, $pks, Criteria::IN);
-			$objs = ProductPeer::doSelect($criteria, $con);
+			$criteria = new Criteria(FieldTypePeer::DATABASE_NAME);
+			$criteria->add(FieldTypePeer::ID, $pks, Criteria::IN);
+			$objs = FieldTypePeer::doSelect($criteria, $con);
 		}
 		return $objs;
 	}
@@ -812,15 +764,15 @@ abstract class BaseProductPeer {
 	{
 	  if (preg_match('/^do(Select|Count)(Join(All(Except)?)?|Stmt)?/', $method, $match))
 	  {
-	    return sprintf('BaseProductPeer:%s:%1$s', 'Count' == $match[1] ? 'doCount' : $match[0]);
+	    return sprintf('BaseFieldTypePeer:%s:%1$s', 'Count' == $match[1] ? 'doCount' : $match[0]);
 	  }
 	
 	  throw new LogicException(sprintf('Unrecognized function "%s"', $method));
 	}
 
-} // BaseProductPeer
+} // BaseFieldTypePeer
 
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-BaseProductPeer::buildTableMap();
+BaseFieldTypePeer::buildTableMap();
 

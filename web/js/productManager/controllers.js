@@ -1,69 +1,60 @@
 'use strict';
 
-/* Controllers */
+function productsListCtrl($scope, $http) {
+	$http.get('/productManager/manageProducts').success(function(data) {
+		$scope.products = data;
+	}); 
+	
+	$http.get('/productManager/manageProducts?do=getCategories').success(function(data) {
+		$scope.categoryList = data;
+	});
+	
+	$scope.updateSubList = function() {
+		$scope.Item.subcategory = "";
+		$scope.products = [];
+		$scope.subList = $scope.categoryList[$scope.Item.category].sub;
+	}
 
-function selectProduct($scope, $location) {
-	$scope.masterItem = {category:"",subcategory:"",product:""};
-	
-	$scope.masterSubCategories = {
-		for_sale: [
-			{ key: 'cars', display: 'Cars' },
-			{ key: 'homes', display: 'Homes'}
-		],
-		community: [
-			{ key: 'garage_sale', display: 'Garage Sale' },
-			{ key: 'psa', display: 'Public Service Announcement' }
-		],
-	};
-	
-	$scope.masterProducts = {
-		defaults: [
-			{ id: 1, name: '7 day posting', price: 10 },
-			{ id: 2, name: '14 day posting', price: 20 },
-			{ id: 3, name: '30 day posting', price: 50 },
-		],
-		garage_sale: [
-			{ id: 1, name: '7 day posting', price: 40 },
-			{ id: 2, name: '14 day posting', price: 80 },
-			{ id: 3, name: '30 day posting', price: 500 },
-		],
-	}
-		
-	$scope.updateProducts = function() {
-		$scope.products = $scope.masterProducts[$scope.Item.subcategory];
-		if ($scope.products == undefined) {
-			$scope.products = $scope.masterProducts.defaults;
-		}
+	$scope.markSelected = function(product) {
+		var selectValue = !product.selected
+		product.selected = selectValue;
 	}
 	
-	$scope.updateSubcategory = function() {
-		$scope.Item.subcategory = '';
-		$scope.Item.product = '';
-		$scope.subCategories = $scope.masterSubCategories[$scope.Item.category];
-	}
-	
-	$scope.updateItem = function(Item) {
-		localStorage.setItem('Item', JSON.stringify(Item));
-		$location.path('/adInfo');
-	}
-	
-	$scope.isClean = function() {
-		if ($scope.Item == undefined) {
-			return true;
-		} else {
-			return false;
-		}
+	$scope.updateProduct = function() {
+		$http.get('/productManager/manageProducts?do=getProducts&category=' + $scope.Item.category + '&subcategory=' + $scope.Item.subcategory).
+			success(function(data) {
+				$scope.products = data;
+			});
 	}
 }
 
-function adInfo($scope, $location) {
-	$scope.Item = JSON.parse(localStorage.getItem('Item'));
+function manageCtrl($scope, $http) {
+	$scope.SubcategoryContainer = {};
+	$scope.theList = [];
 	
-	$scope.previousStep = function() {
-		$location.path('selectProduct');
+	$http.get('/productManager/manageProducts').success(function(data) {
+		$scope.products = data;
+	}); 	
+	
+	$http.get('/productManager/manageProducts?do=getCategories').success(function(data) {
+		$scope.categoryList = data;
+	});
+	
+	$scope.insertIntoSubContainer = function(key) {
+		if (!$scope.SubcategoryContainer[key]) {
+			$scope.SubcategoryContainer[key] = [{}];
+		} else {
+			$scope.SubcategoryContainer[key].push({});
+		}
+		
+		$scope.theList = $scope.SubcategoryContainer[key];	
+	}	
+	
+	$scope.updateCategories = function() {
+		angular.forEach($scope.categoryList, function(category,key) {
+			category.price = $scope.MasterPrice;
+		});
 	}
 	
-	$scope.nextStep = function() {
-		console.log('Go to checkout');
-	}
+
 }

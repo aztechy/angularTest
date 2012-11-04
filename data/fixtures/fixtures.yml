@@ -36,3 +36,25 @@ customProductPrice:
     custom_product_price_type_id: category
     price: 35.00
   
+fieldType:
+  fieldCategory:
+    type: category
+  fieldSubCategory:
+    type: subcategory
+    parent_id: fieldCategory
+    
+field:
+  forSale:
+    field_type_id: fieldCategory
+    token: For Sale
+  community:
+    field_type_id: fieldCategory
+    token: Community
+  carForSale:
+    field_type_id: fieldSubCategory
+    token: Car
+    parent_id: forSale
+  garageSale:
+    field_type_id: fieldSubCategory
+    token: Garage Sale
+    parent_id: community

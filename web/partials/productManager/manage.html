@@ -1,0 +1,26 @@
+Master: <input type="text" ng-model="MasterPrice" ng-change="updateCategories()">
+
+<div id="categoryPanel">
+  <div>Categories:</div>
+  <div ng-repeat="(key, category) in categoryList">
+    <div class="category">{{ category.parentName }} <input type="text" value="{{category.price}}"/></div>
+    <div ng-model="someModel" ng-repeat="subcategory in SubcategoryContainer | filter:{id:key}">
+      <select name="subcategory">
+        <option value=""></option>
+        <option ng-repeat="sc in category.sub">{{ sc.token }} <input type="text"/></option>
+      </select>
+    </div>
+    <button ng-click="insertIntoSubContainer(key)">Add</button>
+  </div>
+</div>
+
+<div id="products">
+  <div class="product" ng-repeat="product in products">
+    <span id="{{product.id}}">Id ({{ product.id }}): {{ product.name }}</span>
+  </div>
+</div>
+
+
+
+<div>{{ categoryList }}</div>
+<div>Container: {{ SubcategoryContainer }}</div>
