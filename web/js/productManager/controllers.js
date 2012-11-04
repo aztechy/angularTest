@@ -29,8 +29,7 @@ function productsListCtrl($scope, $http) {
 }
 
 function manageCtrl($scope, $http) {
-	$scope.SubcategoryContainer = {};
-	$scope.theList = [];
+	$scope.SubcategoryContainer = [];
 	
 	$http.get('/productManager/manageProducts').success(function(data) {
 		$scope.products = data;
@@ -41,13 +40,7 @@ function manageCtrl($scope, $http) {
 	});
 	
 	$scope.insertIntoSubContainer = function(key) {
-		if (!$scope.SubcategoryContainer[key]) {
-			$scope.SubcategoryContainer[key] = [{}];
-		} else {
-			$scope.SubcategoryContainer[key].push({});
-		}
-		
-		$scope.theList = $scope.SubcategoryContainer[key];	
+		$scope.SubcategoryContainer.push({id: key, subname: null, subid: null});
 	}	
 	
 	$scope.updateCategories = function() {
