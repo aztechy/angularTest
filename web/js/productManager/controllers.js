@@ -28,7 +28,7 @@ function productsListCtrl($scope, $http) {
 	}
 }
 
-function manageCtrl($scope, $http) {
+function manageCtrl($scope, $http, $filter) {
 	$scope.SubcategoryContainer = [];
 	
 	$http.get('/productManager/manageProducts').success(function(data) {
@@ -40,7 +40,13 @@ function manageCtrl($scope, $http) {
 	});
 	
 	$scope.insertIntoSubContainer = function(key) {
-		$scope.SubcategoryContainer.push({id: key, subname: null, subid: null});
+		//Push only if we haven't exceeded the subcategory limit.
+		var itemsForKey = $scope.categoryList[key].sub.length;
+		var itemsPushedForKey = $filter('filter')($scope.SubcategoryContainer, {id:key}).length;
+		if (itemsPushedForKey < itemsForKey) {
+			$scope.SubcategoryContainer.push({id: key, subname: null, subid: null, selected: false});			
+		}
+
 	}	
 	
 	$scope.updateCategories = function() {
@@ -49,5 +55,13 @@ function manageCtrl($scope, $http) {
 		});
 	}
 	
-
+	$scope.detectChange = function(key, subkey,model) {
+			console.log($scope.SubcategoryContainer[subkey]);
+			var selectedItem = $scope.SubcategoryContainer[subkey];
+			var subItem = $filter('filter')($scope.categoryList[key].sub, {token:model});
+			console.log(subItem);
+			selectedItem.selected = true;
+			selectedItem.subname = subItem[0].token;
+			selectedItem.subid = subItem[0].id;
+	}
 }

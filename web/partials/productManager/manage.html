@@ -4,10 +4,10 @@ Master: <input type="text" ng-model="MasterPrice" ng-change="updateCategories()"
   <div>Categories:</div>
   <div ng-repeat="(key, category) in categoryList">
     <div class="category">{{ category.parentName }} <input type="text" value="{{category.price}}"/></div>
-    <div ng-model="someModel" ng-repeat="subcategory in SubcategoryContainer | filter:{id:key}">
-      <select name="subcategory">
+    <div ng-repeat="(subkey, subcategory) in SubcategoryContainer | filter:{id:key}">
+      <select ng-model="testModel" ng-change="detectChange(key, subkey, testModel)" name="subcategory">
         <option value=""></option>
-        <option ng-repeat="sc in category.sub">{{ sc.token }} <input type="text"/></option>
+        <option value="{{sc.token}}" ng-repeat="sc in category.sub">{{ sc.token }} <input type="text"/></option>
       </select>
     </div>
     <button ng-click="insertIntoSubContainer(key)">Add</button>
@@ -24,3 +24,4 @@ Master: <input type="text" ng-model="MasterPrice" ng-change="updateCategories()"
 
 <div>{{ categoryList }}</div>
 <div>Container: {{ SubcategoryContainer }}</div>
+<div>Some Model: {{ testModel }}</div>
