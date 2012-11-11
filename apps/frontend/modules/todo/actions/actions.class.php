@@ -19,4 +19,8 @@ class todoActions extends sfActions
   {
     
   }
+  
+  public function executeSanta(sfWebRequest $request)
+  {
+  }
 }
