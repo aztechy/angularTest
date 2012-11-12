@@ -37,3 +37,9 @@ propel:
     price: { phpName: Price, type: DECIMAL, size: '11', scale: '2', required: false, defaultValue: '0.00' }
     created_at: { phpName: CreatedAt, type: TIMESTAMP, required: true }
     modified_at: { phpName: ModifiedAt, type: TIMESTAMP, required: true }
+  secret_santa:
+    _attributes: { phpName: SecretSanta }
+    id: { phpName: Id, type: INTEGER, size: '11', primaryKey: true, autoIncrement: true, required: true }
+    name: { phpName: Name, type: VARCHAR, size: '255', required: true }
+    match_name: { phpName: MatchName, type: VARCHAR, size: '255', required: false }
+    matched: { phpName: Matched, type: TINYINT, size: '1', required: false, defaultValue: '0' }

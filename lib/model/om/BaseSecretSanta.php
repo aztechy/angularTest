@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Base class that represents a row from the 'field_types' table.
+ * Base class that represents a row from the 'secret_santa' table.
  *
  * 
  *
@@ -11,14 +11,14 @@
  *
  * @package    lib.model.om
  */
-abstract class BaseFieldType extends BaseObject  implements Persistent {
+abstract class BaseSecretSanta extends BaseObject  implements Persistent {
 
 
 	/**
 	 * The Peer class.
 	 * Instance provides a convenient way of calling static methods on a class
 	 * that calling code may not be able to identify.
-	 * @var        FieldTypePeer
+	 * @var        SecretSantaPeer
 	 */
 	protected static $peer;
 
@@ -29,26 +29,23 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 	protected $id;
 
 	/**
-	 * The value for the type field.
+	 * The value for the name field.
 	 * @var        string
 	 */
-	protected $type;
+	protected $name;
 
 	/**
-	 * The value for the parent_id field.
+	 * The value for the match_name field.
+	 * @var        string
+	 */
+	protected $match_name;
+
+	/**
+	 * The value for the matched field.
+	 * Note: this column has a database default value of: 0
 	 * @var        int
 	 */
-	protected $parent_id;
-
-	/**
-	 * @var        array Field[] Collection to store aggregation of Field objects.
-	 */
-	protected $collFields;
-
-	/**
-	 * @var        Criteria The criteria used to select the current contents of collFields.
-	 */
-	private $lastFieldCriteria = null;
+	protected $matched;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -66,7 +63,28 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 
 	// symfony behavior
 	
-	const PEER = 'FieldTypePeer';
+	const PEER = 'SecretSantaPeer';
+
+	/**
+	 * Applies default values to this object.
+	 * This method should be called from the object's constructor (or
+	 * equivalent initialization method).
+	 * @see        __construct()
+	 */
+	public function applyDefaultValues()
+	{
+		$this->matched = 0;
+	}
+
+	/**
+	 * Initializes internal state of BaseSecretSanta object.
+	 * @see        applyDefaults()
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+		$this->applyDefaultValues();
+	}
 
 	/**
 	 * Get the [id] column value.
@@ -79,30 +97,40 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [type] column value.
+	 * Get the [name] column value.
 	 * 
 	 * @return     string
 	 */
-	public function getType()
+	public function getName()
 	{
-		return $this->type;
+		return $this->name;
 	}
 
 	/**
-	 * Get the [parent_id] column value.
+	 * Get the [match_name] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getMatchName()
+	{
+		return $this->match_name;
+	}
+
+	/**
+	 * Get the [matched] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getParentId()
+	public function getMatched()
 	{
-		return $this->parent_id;
+		return $this->matched;
 	}
 
 	/**
 	 * Set the value of [id] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     FieldType The current object (for fluent API support)
+	 * @return     SecretSanta The current object (for fluent API support)
 	 */
 	public function setId($v)
 	{
@@ -112,51 +140,71 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 
 		if ($this->id !== $v) {
 			$this->id = $v;
-			$this->modifiedColumns[] = FieldTypePeer::ID;
+			$this->modifiedColumns[] = SecretSantaPeer::ID;
 		}
 
 		return $this;
 	} // setId()
 
 	/**
-	 * Set the value of [type] column.
+	 * Set the value of [name] column.
 	 * 
 	 * @param      string $v new value
-	 * @return     FieldType The current object (for fluent API support)
+	 * @return     SecretSanta The current object (for fluent API support)
 	 */
-	public function setType($v)
+	public function setName($v)
 	{
 		if ($v !== null) {
 			$v = (string) $v;
 		}
 
-		if ($this->type !== $v) {
-			$this->type = $v;
-			$this->modifiedColumns[] = FieldTypePeer::TYPE;
+		if ($this->name !== $v) {
+			$this->name = $v;
+			$this->modifiedColumns[] = SecretSantaPeer::NAME;
 		}
 
 		return $this;
-	} // setType()
+	} // setName()
 
 	/**
-	 * Set the value of [parent_id] column.
+	 * Set the value of [match_name] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     SecretSanta The current object (for fluent API support)
+	 */
+	public function setMatchName($v)
+	{
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->match_name !== $v) {
+			$this->match_name = $v;
+			$this->modifiedColumns[] = SecretSantaPeer::MATCH_NAME;
+		}
+
+		return $this;
+	} // setMatchName()
+
+	/**
+	 * Set the value of [matched] column.
 	 * 
 	 * @param      int $v new value
-	 * @return     FieldType The current object (for fluent API support)
+	 * @return     SecretSanta The current object (for fluent API support)
 	 */
-	public function setParentId($v)
+	public function setMatched($v)
 	{
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->parent_id !== $v) {
-			$this->parent_id = $v;
-			$this->modifiedColumns[] = FieldTypePeer::PARENT_ID;
+		if ($this->matched !== $v || $this->isNew()) {
+			$this->matched = $v;
+			$this->modifiedColumns[] = SecretSantaPeer::MATCHED;
 		}
 
 		return $this;
-	} // setParentId()
+	} // setMatched()
 
 	/**
 	 * Indicates whether the columns in this object are only set to default values.
@@ -168,6 +216,10 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 	 */
 	public function hasOnlyDefaultValues()
 	{
+			if ($this->matched !== 0) {
+				return false;
+			}
+
 		// otherwise, everything was equal, so return TRUE
 		return true;
 	} // hasOnlyDefaultValues()
@@ -191,8 +243,9 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-			$this->type = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-			$this->parent_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+			$this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
+			$this->match_name = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+			$this->matched = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -202,10 +255,10 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 3; // 3 = FieldTypePeer::NUM_COLUMNS - FieldTypePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 4; // 4 = SecretSantaPeer::NUM_COLUMNS - SecretSantaPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
-			throw new PropelException("Error populating FieldType object", $e);
+			throw new PropelException("Error populating SecretSanta object", $e);
 		}
 	}
 
@@ -248,13 +301,13 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(FieldTypePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(SecretSantaPeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		}
 
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
-		$stmt = FieldTypePeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		$stmt = SecretSantaPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {
@@ -263,9 +316,6 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 		$this->hydrate($row, 0, true); // rehydrate
 
 		if ($deep) {  // also de-associate any related objects?
-
-			$this->collFields = null;
-			$this->lastFieldCriteria = null;
 
 		} // if (deep)
 	}
@@ -286,14 +336,14 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(FieldTypePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(SecretSantaPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		
 		$con->beginTransaction();
 		try {
 			$ret = $this->preDelete($con);
 			// symfony_behaviors behavior
-			foreach (sfMixer::getCallables('BaseFieldType:delete:pre') as $callable)
+			foreach (sfMixer::getCallables('BaseSecretSanta:delete:pre') as $callable)
 			{
 			  if (call_user_func($callable, $this, $con))
 			  {
@@ -304,10 +354,10 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 			}
 
 			if ($ret) {
-				FieldTypePeer::doDelete($this, $con);
+				SecretSantaPeer::doDelete($this, $con);
 				$this->postDelete($con);
 				// symfony_behaviors behavior
-				foreach (sfMixer::getCallables('BaseFieldType:delete:post') as $callable)
+				foreach (sfMixer::getCallables('BaseSecretSanta:delete:post') as $callable)
 				{
 				  call_user_func($callable, $this, $con);
 				}
@@ -343,7 +393,7 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 		}
 
 		if ($con === null) {
-			$con = Propel::getConnection(FieldTypePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(SecretSantaPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		
 		$con->beginTransaction();
@@ -351,7 +401,7 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 		try {
 			$ret = $this->preSave($con);
 			// symfony_behaviors behavior
-			foreach (sfMixer::getCallables('BaseFieldType:save:pre') as $callable)
+			foreach (sfMixer::getCallables('BaseSecretSanta:save:pre') as $callable)
 			{
 			  if (is_integer($affectedRows = call_user_func($callable, $this, $con)))
 			  {
@@ -375,12 +425,12 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 				}
 				$this->postSave($con);
 				// symfony_behaviors behavior
-				foreach (sfMixer::getCallables('BaseFieldType:save:post') as $callable)
+				foreach (sfMixer::getCallables('BaseSecretSanta:save:post') as $callable)
 				{
 				  call_user_func($callable, $this, $con, $affectedRows);
 				}
 
-				FieldTypePeer::addInstanceToPool($this);
+				SecretSantaPeer::addInstanceToPool($this);
 			} else {
 				$affectedRows = 0;
 			}
@@ -410,13 +460,13 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 			$this->alreadyInSave = true;
 
 			if ($this->isNew() ) {
-				$this->modifiedColumns[] = FieldTypePeer::ID;
+				$this->modifiedColumns[] = SecretSantaPeer::ID;
 			}
 
 			// If this object has been modified, then save it to the database.
 			if ($this->isModified()) {
 				if ($this->isNew()) {
-					$pk = FieldTypePeer::doInsert($this, $con);
+					$pk = SecretSantaPeer::doInsert($this, $con);
 					$affectedRows += 1; // we are assuming that there is only 1 row per doInsert() which
 										 // should always be true here (even though technically
 										 // BasePeer::doInsert() can insert multiple rows).
@@ -425,18 +475,10 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 
 					$this->setNew(false);
 				} else {
-					$affectedRows += FieldTypePeer::doUpdate($this, $con);
+					$affectedRows += SecretSantaPeer::doUpdate($this, $con);
 				}
 
 				$this->resetModified(); // [HL] After being saved an object is no longer 'modified'
-			}
-
-			if ($this->collFields !== null) {
-				foreach ($this->collFields as $referrerFK) {
-					if (!$referrerFK->isDeleted()) {
-						$affectedRows += $referrerFK->save($con);
-					}
-				}
 			}
 
 			$this->alreadyInSave = false;
@@ -505,18 +547,10 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 			$failureMap = array();
 
 
-			if (($retval = FieldTypePeer::doValidate($this, $columns)) !== true) {
+			if (($retval = SecretSantaPeer::doValidate($this, $columns)) !== true) {
 				$failureMap = array_merge($failureMap, $retval);
 			}
 
-
-				if ($this->collFields !== null) {
-					foreach ($this->collFields as $referrerFK) {
-						if (!$referrerFK->validate($columns)) {
-							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-						}
-					}
-				}
 
 
 			$this->alreadyInValidation = false;
@@ -536,7 +570,7 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 	 */
 	public function getByName($name, $type = BasePeer::TYPE_PHPNAME)
 	{
-		$pos = FieldTypePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+		$pos = SecretSantaPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 		$field = $this->getByPosition($pos);
 		return $field;
 	}
@@ -555,10 +589,13 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 				return $this->getId();
 				break;
 			case 1:
-				return $this->getType();
+				return $this->getName();
 				break;
 			case 2:
-				return $this->getParentId();
+				return $this->getMatchName();
+				break;
+			case 3:
+				return $this->getMatched();
 				break;
 			default:
 				return null;
@@ -579,11 +616,12 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 	 */
 	public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true)
 	{
-		$keys = FieldTypePeer::getFieldNames($keyType);
+		$keys = SecretSantaPeer::getFieldNames($keyType);
 		$result = array(
 			$keys[0] => $this->getId(),
-			$keys[1] => $this->getType(),
-			$keys[2] => $this->getParentId(),
+			$keys[1] => $this->getName(),
+			$keys[2] => $this->getMatchName(),
+			$keys[3] => $this->getMatched(),
 		);
 		return $result;
 	}
@@ -600,7 +638,7 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 	 */
 	public function setByName($name, $value, $type = BasePeer::TYPE_PHPNAME)
 	{
-		$pos = FieldTypePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+		$pos = SecretSantaPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 		return $this->setByPosition($pos, $value);
 	}
 
@@ -619,10 +657,13 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 				$this->setId($value);
 				break;
 			case 1:
-				$this->setType($value);
+				$this->setName($value);
 				break;
 			case 2:
-				$this->setParentId($value);
+				$this->setMatchName($value);
+				break;
+			case 3:
+				$this->setMatched($value);
 				break;
 		} // switch()
 	}
@@ -646,11 +687,12 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 	 */
 	public function fromArray($arr, $keyType = BasePeer::TYPE_PHPNAME)
 	{
-		$keys = FieldTypePeer::getFieldNames($keyType);
+		$keys = SecretSantaPeer::getFieldNames($keyType);
 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-		if (array_key_exists($keys[1], $arr)) $this->setType($arr[$keys[1]]);
-		if (array_key_exists($keys[2], $arr)) $this->setParentId($arr[$keys[2]]);
+		if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
+		if (array_key_exists($keys[2], $arr)) $this->setMatchName($arr[$keys[2]]);
+		if (array_key_exists($keys[3], $arr)) $this->setMatched($arr[$keys[3]]);
 	}
 
 	/**
@@ -660,11 +702,12 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 	 */
 	public function buildCriteria()
 	{
-		$criteria = new Criteria(FieldTypePeer::DATABASE_NAME);
+		$criteria = new Criteria(SecretSantaPeer::DATABASE_NAME);
 
-		if ($this->isColumnModified(FieldTypePeer::ID)) $criteria->add(FieldTypePeer::ID, $this->id);
-		if ($this->isColumnModified(FieldTypePeer::TYPE)) $criteria->add(FieldTypePeer::TYPE, $this->type);
-		if ($this->isColumnModified(FieldTypePeer::PARENT_ID)) $criteria->add(FieldTypePeer::PARENT_ID, $this->parent_id);
+		if ($this->isColumnModified(SecretSantaPeer::ID)) $criteria->add(SecretSantaPeer::ID, $this->id);
+		if ($this->isColumnModified(SecretSantaPeer::NAME)) $criteria->add(SecretSantaPeer::NAME, $this->name);
+		if ($this->isColumnModified(SecretSantaPeer::MATCH_NAME)) $criteria->add(SecretSantaPeer::MATCH_NAME, $this->match_name);
+		if ($this->isColumnModified(SecretSantaPeer::MATCHED)) $criteria->add(SecretSantaPeer::MATCHED, $this->matched);
 
 		return $criteria;
 	}
@@ -679,9 +722,9 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 	 */
 	public function buildPkeyCriteria()
 	{
-		$criteria = new Criteria(FieldTypePeer::DATABASE_NAME);
+		$criteria = new Criteria(SecretSantaPeer::DATABASE_NAME);
 
-		$criteria->add(FieldTypePeer::ID, $this->id);
+		$criteria->add(SecretSantaPeer::ID, $this->id);
 
 		return $criteria;
 	}
@@ -712,30 +755,18 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 	 * If desired, this method can also make copies of all associated (fkey referrers)
 	 * objects.
 	 *
-	 * @param      object $copyObj An object of FieldType (or compatible) type.
+	 * @param      object $copyObj An object of SecretSanta (or compatible) type.
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
 	 * @throws     PropelException
 	 */
 	public function copyInto($copyObj, $deepCopy = false)
 	{
 
-		$copyObj->setType($this->type);
+		$copyObj->setName($this->name);
 
-		$copyObj->setParentId($this->parent_id);
+		$copyObj->setMatchName($this->match_name);
 
-
-		if ($deepCopy) {
-			// important: temporarily setNew(false) because this affects the behavior of
-			// the getter/setter methods for fkey referrer objects.
-			$copyObj->setNew(false);
-
-			foreach ($this->getFields() as $relObj) {
-				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-					$copyObj->addField($relObj->copy($deepCopy));
-				}
-			}
-
-		} // if ($deepCopy)
+		$copyObj->setMatched($this->matched);
 
 
 		$copyObj->setNew(true);
@@ -753,7 +784,7 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 	 * objects.
 	 *
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-	 * @return     FieldType Clone of current object.
+	 * @return     SecretSanta Clone of current object.
 	 * @throws     PropelException
 	 */
 	public function copy($deepCopy = false)
@@ -772,168 +803,14 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 	 * same instance for all member of this class. The method could therefore
 	 * be static, but this would prevent one from overriding the behavior.
 	 *
-	 * @return     FieldTypePeer
+	 * @return     SecretSantaPeer
 	 */
 	public function getPeer()
 	{
 		if (self::$peer === null) {
-			self::$peer = new FieldTypePeer();
+			self::$peer = new SecretSantaPeer();
 		}
 		return self::$peer;
-	}
-
-	/**
-	 * Clears out the collFields collection (array).
-	 *
-	 * This does not modify the database; however, it will remove any associated objects, causing
-	 * them to be refetched by subsequent calls to accessor method.
-	 *
-	 * @return     void
-	 * @see        addFields()
-	 */
-	public function clearFields()
-	{
-		$this->collFields = null; // important to set this to NULL since that means it is uninitialized
-	}
-
-	/**
-	 * Initializes the collFields collection (array).
-	 *
-	 * By default this just sets the collFields collection to an empty array (like clearcollFields());
-	 * however, you may wish to override this method in your stub class to provide setting appropriate
-	 * to your application -- for example, setting the initial array to the values stored in database.
-	 *
-	 * @return     void
-	 */
-	public function initFields()
-	{
-		$this->collFields = array();
-	}
-
-	/**
-	 * Gets an array of Field objects which contain a foreign key that references this object.
-	 *
-	 * If this collection has already been initialized with an identical Criteria, it returns the collection.
-	 * Otherwise if this FieldType has previously been saved, it will retrieve
-	 * related Fields from storage. If this FieldType is new, it will return
-	 * an empty collection or the current collection, the criteria is ignored on a new object.
-	 *
-	 * @param      PropelPDO $con
-	 * @param      Criteria $criteria
-	 * @return     array Field[]
-	 * @throws     PropelException
-	 */
-	public function getFields($criteria = null, PropelPDO $con = null)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(FieldTypePeer::DATABASE_NAME);
-		}
-		elseif ($criteria instanceof Criteria)
-		{
-			$criteria = clone $criteria;
-		}
-
-		if ($this->collFields === null) {
-			if ($this->isNew()) {
-			   $this->collFields = array();
-			} else {
-
-				$criteria->add(FieldPeer::FIELD_TYPE_ID, $this->id);
-
-				FieldPeer::addSelectColumns($criteria);
-				$this->collFields = FieldPeer::doSelect($criteria, $con);
-			}
-		} else {
-			// criteria has no effect for a new object
-			if (!$this->isNew()) {
-				// the following code is to determine if a new query is
-				// called for.  If the criteria is the same as the last
-				// one, just return the collection.
-
-
-				$criteria->add(FieldPeer::FIELD_TYPE_ID, $this->id);
-
-				FieldPeer::addSelectColumns($criteria);
-				if (!isset($this->lastFieldCriteria) || !$this->lastFieldCriteria->equals($criteria)) {
-					$this->collFields = FieldPeer::doSelect($criteria, $con);
-				}
-			}
-		}
-		$this->lastFieldCriteria = $criteria;
-		return $this->collFields;
-	}
-
-	/**
-	 * Returns the number of related Field objects.
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct
-	 * @param      PropelPDO $con
-	 * @return     int Count of related Field objects.
-	 * @throws     PropelException
-	 */
-	public function countFields(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(FieldTypePeer::DATABASE_NAME);
-		} else {
-			$criteria = clone $criteria;
-		}
-
-		if ($distinct) {
-			$criteria->setDistinct();
-		}
-
-		$count = null;
-
-		if ($this->collFields === null) {
-			if ($this->isNew()) {
-				$count = 0;
-			} else {
-
-				$criteria->add(FieldPeer::FIELD_TYPE_ID, $this->id);
-
-				$count = FieldPeer::doCount($criteria, false, $con);
-			}
-		} else {
-			// criteria has no effect for a new object
-			if (!$this->isNew()) {
-				// the following code is to determine if a new query is
-				// called for.  If the criteria is the same as the last
-				// one, just return count of the collection.
-
-
-				$criteria->add(FieldPeer::FIELD_TYPE_ID, $this->id);
-
-				if (!isset($this->lastFieldCriteria) || !$this->lastFieldCriteria->equals($criteria)) {
-					$count = FieldPeer::doCount($criteria, false, $con);
-				} else {
-					$count = count($this->collFields);
-				}
-			} else {
-				$count = count($this->collFields);
-			}
-		}
-		return $count;
-	}
-
-	/**
-	 * Method called to associate a Field object to this object
-	 * through the Field foreign key attribute.
-	 *
-	 * @param      Field $l Field
-	 * @return     void
-	 * @throws     PropelException
-	 */
-	public function addField(Field $l)
-	{
-		if ($this->collFields === null) {
-			$this->initFields();
-		}
-		if (!in_array($l, $this->collFields, true)) { // only add it if the **same** object is not already associated
-			array_push($this->collFields, $l);
-			$l->setFieldType($this);
-		}
 	}
 
 	/**
@@ -948,14 +825,8 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 	public function clearAllReferences($deep = false)
 	{
 		if ($deep) {
-			if ($this->collFields) {
-				foreach ((array) $this->collFields as $o) {
-					$o->clearAllReferences($deep);
-				}
-			}
 		} // if ($deep)
 
-		$this->collFields = null;
 	}
 
 	// symfony_behaviors behavior
@@ -965,9 +836,9 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 	 */
 	public function __call($method, $arguments)
 	{
-	  if (!$callable = sfMixer::getCallable('BaseFieldType:'.$method))
+	  if (!$callable = sfMixer::getCallable('BaseSecretSanta:'.$method))
 	  {
-	    throw new sfException(sprintf('Call to undefined method BaseFieldType::%s', $method));
+	    throw new sfException(sprintf('Call to undefined method BaseSecretSanta::%s', $method));
 	  }
 	
 	  array_unshift($arguments, $this);
@@ -975,4 +846,4 @@ abstract class BaseFieldType extends BaseObject  implements Persistent {
 	  return call_user_func_array($callable, $arguments);
 	}
 
-} // BaseFieldType
+} // BaseSecretSanta

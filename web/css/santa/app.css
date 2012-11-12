@@ -1,0 +1,18 @@
+#hatContents, #matchContents {
+  border: 1px solid black;
+  width: 300px;
+  padding: 10px;
+}
+#hatList {
+  margin-top: 10px;
+}
+
+#matchContainer {
+	float:right;
+	margin-left: auto;
+	margin-right: 600px;
+	margin-top: -23px;
+}
+#nameInput {
+	width: 200px;
+}
